@@ -65,16 +65,16 @@ export const schema = yup.object({
     .email('Email khong dung dinh dang')
     .min(5, 'Do dai tu 5-160')
     .max(160, 'Do dai tu 5-160'),
-  password: yup.string().required('Password la bat buoc').min(6, 'Do dai tu 6-160').max(6, 'Do dai tu 6-160'),
+  password: yup.string().required('Password la bat buoc').min(6, 'Do dai tu 6-160').max(160, 'Do dai tu 6-160'),
   confirm_password: yup
     .string()
     .required('Nhap lai password la bat buoc')
     .min(6, 'Do dai tu 6-160')
-    .max(6, 'Do dai tu 6-160')
+    .max(160, 'Do dai tu 6-160')
     .oneOf([yup.ref('password')], 'Nhap lai password khong khop')
 })
 
-const loginSchema = schema.omit(['confirm_password'])
-export type LoginSchema = yup.InferType<typeof schema>
+export const loginSchema = schema.omit(['confirm_password'])
+export type LoginSchema = yup.InferType<typeof loginSchema>
 
 export type Schema = yup.InferType<typeof schema>
