@@ -1,11 +1,40 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import Popover from '../Popover'
+import { useMutation } from '@tanstack/react-query'
+import { logout } from 'src/apis/auth.api'
+import { AppContext } from 'src/contexts/app.context'
+import { useContext } from 'react'
 
 export default function Header() {
+  const { setIsAuthenticated, isAuthenticated, setProfile, profile } = useContext(AppContext)
+  const logoutMutation = useMutation({
+    mutationFn: () => logout(),
+    onSuccess: () => {
+      setIsAuthenticated(false)
+      // it will auto navigate
+      setProfile(null)
+    }
+  })
+
+  const handleLogout = () => {
+    logoutMutation.mutate()
+  }
+
   return (
     <div className='bg-[linear-gradient(-180deg,#f53d2d,#f63)] pb-5 pt-2 text-white'>
       <div className='container'>
         <div className='flex justify-end'>
-          <div className='flex cursor-pointer items-center py-1 hover:text-gray-300'>
+          <Popover
+            className='flex cursor-pointer items-center py-1 hover:text-gray-300'
+            renderPopover={
+              <div className='relative rounded-sm border border-gray-200 bg-white shadow-md'>
+                <div className='flex flex-col py-2 pl-3 pr-28'>
+                  <button className='px-3 py-2 hover:text-orange'>Tiếng Việt</button>
+                  <button className='mt-2 px-3 py-2 hover:text-orange'>English</button>
+                </div>
+              </div>
+            }
+          >
             <svg
               xmlns='http://www.w3.org/2000/svg'
               fill='none'
@@ -31,17 +60,49 @@ export default function Header() {
             >
               <path strokeLinecap='round' strokeLinejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' />
             </svg>
-          </div>
-          <div className='ml-6 flex cursor-pointer items-center py-1 hover:text-gray-300'>
-            <div className='mr-2 h-5 w-5 flex-shrink-0'>
-              <img
-                src='https://images.unsplash.com/photo-1697529985337-4a324794d22f?auto=format&fit=crop&q=80&w=1887&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-                alt=''
-                className='h-full w-full rounded-full object-cover'
-              />
+          </Popover>
+          {isAuthenticated && (
+            <Popover
+              className='ml-6 flex cursor-pointer items-center py-1 hover:text-gray-300'
+              renderPopover={
+                <div>
+                  <Link to='/profile' className='block bg-white px-4 py-3 hover:bg-slate-100 hover:text-cyan-500'>
+                    Tài khoản của tôi
+                  </Link>
+                  <Link to='/' className='block bg-white px-4 py-3 hover:bg-slate-100 hover:text-cyan-500'>
+                    Đơn mua
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className='w-full bg-white px-4 py-3 text-left hover:bg-slate-100 hover:text-cyan-500'
+                  >
+                    Đăng xuất
+                  </button>
+                </div>
+              }
+            >
+              <div className='mr-2 h-5 w-5 flex-shrink-0'>
+                <img
+                  src='https://images.unsplash.com/photo-1697529985337-4a324794d22f?auto=format&fit=crop&q=80&w=1887&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+                  alt=''
+                  className='h-full w-full rounded-full object-cover'
+                />
+              </div>
+              <span className='mx-1'>{profile?.email}</span>
+            </Popover>
+          )}
+
+          {!isAuthenticated && (
+            <div className='flex items-center'>
+              <Link to='/register' className='mx-3 capitalize hover:text-white/70'>
+                Đăng ký
+              </Link>
+              <div className='h-4 border-r-[1px] border-r-white/40'></div>
+              <Link to='/login' className='mx-3 capitalize hover:text-white/70'>
+                Đăng nhập
+              </Link>
             </div>
-            <span className='mx-1'>amosivor</span>
-          </div>
+          )}
         </div>
 
         <div className='mt-4 grid grid-cols-12 items-end gap-4'>
@@ -78,22 +139,87 @@ export default function Header() {
               </button>
             </div>
           </form>
-          <Link to='/' className='col-span-1 justify-self-end'>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              fill='none'
-              viewBox='0 0 24 24'
-              strokeWidth={1.5}
-              stroke='currentColor'
-              className='h-8 w-8'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                d='M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z'
-              />
-            </svg>
-          </Link>
+          <Popover
+            className='col-span-1 justify-self-end'
+            placement='bottom-end'
+            renderPopover={
+              <div className='relative max-w-[400px] rounded-sm border border-gray-200 bg-white shadow-md'>
+                <div className='p-2'>
+                  <div className='capitalize text-gray-400'>Sản phẩm mới thêm</div>
+                  <div className='mt-5'>
+                    <div className='mt-4 flex'>
+                      <div className='h-11 w-11 flex-shrink-0'>
+                        <img
+                          src='https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+                          alt='images'
+                          className='h-full w-full object-cover'
+                        />
+                      </div>
+                      <div className='ml-2 flex-grow overflow-hidden'>
+                        <div className='truncate'>Giày thể thao giúp chạy nhanh hơn và không bị chấn thương</div>
+                      </div>
+                      <div className='ml-2 flex-shrink-0'>
+                        <span className='text-orange'>đ459.000</span>
+                      </div>
+                    </div>
+                    <div className='mt-4 flex'>
+                      <div className='h-11 w-11 flex-shrink-0'>
+                        <img
+                          src='https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+                          alt='images'
+                          className='h-full w-full object-cover'
+                        />
+                      </div>
+                      <div className='ml-2 flex-grow overflow-hidden'>
+                        <div className='truncate'>Giày thể thao giúp chạy nhanh hơn và không bị chấn thương</div>
+                      </div>
+                      <div className='ml-2 flex-shrink-0'>
+                        <span className='text-orange'>đ459.000</span>
+                      </div>
+                    </div>
+                    <div className='mt-4 flex'>
+                      <div className='h-11 w-11 flex-shrink-0'>
+                        <img
+                          src='https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+                          alt='images'
+                          className='h-full w-full object-cover'
+                        />
+                      </div>
+                      <div className='ml-2 flex-grow overflow-hidden'>
+                        <div className='truncate'>Giày thể thao giúp chạy nhanh hơn và không bị chấn thương</div>
+                      </div>
+                      <div className='ml-2 flex-shrink-0'>
+                        <span className='text-orange'>đ459.000</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className='mt-6 flex items-center justify-between'>
+                    <div className='text-xs capitalize text-gray-500'>Thêm vào giỏ hàng</div>
+                    <button className='rounded-sm bg-orange px-4 py-2 capitalize text-white hover:bg-opacity-90'>
+                      Xem giỏ hàng
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          >
+            <Link to='/'>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+                strokeWidth={1.5}
+                stroke='currentColor'
+                className='h-8 w-8'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  d='M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z'
+                />
+              </svg>
+            </Link>
+          </Popover>
         </div>
       </div>
     </div>
