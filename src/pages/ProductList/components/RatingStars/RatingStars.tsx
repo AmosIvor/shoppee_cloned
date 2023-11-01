@@ -1,6 +1,6 @@
 import { createSearchParams, useNavigate } from 'react-router-dom'
 import PATH from 'src/constant/path'
-import { QueryConfig } from '../ProductList'
+import { QueryConfig } from '../../ProductList'
 import { omit } from 'lodash'
 
 interface Props {
