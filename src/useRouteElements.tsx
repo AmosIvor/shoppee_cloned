@@ -8,6 +8,7 @@ import Profile from './pages/Profile'
 import { useContext } from 'react'
 import { AppContext } from './contexts/app.context'
 import PATH from './constant/path'
+import ProductDetail from './pages/ProductDetail'
 
 function ProtectedRoute() {
   const { isAuthenticated } = useContext(AppContext)
@@ -21,15 +22,6 @@ function RejectedRoute() {
 
 export default function useRouteElements() {
   const routeElements = useRoutes([
-    {
-      path: PATH.home,
-      index: true,
-      element: (
-        <MainLayout>
-          <ProductList />
-        </MainLayout>
-      )
-    },
     {
       path: PATH.home,
       element: <ProtectedRoute />,
@@ -65,6 +57,24 @@ export default function useRouteElements() {
           )
         }
       ]
+    },
+    {
+      path: PATH.home,
+      index: true,
+      element: (
+        <MainLayout>
+          <ProductList />
+        </MainLayout>
+      )
+    },
+    {
+      path: PATH.productDetail,
+      index: true,
+      element: (
+        <MainLayout>
+          <ProductDetail />
+        </MainLayout>
+      )
     }
   ])
   return routeElements
