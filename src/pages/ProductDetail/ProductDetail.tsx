@@ -105,7 +105,7 @@ export default function ProductDetail() {
   }
 
   const handleBuyCount = (value: number) => {
-    console.log(value)
+    // console.log(value)
     setBuyCount(value)
   }
 
