@@ -11,8 +11,11 @@ import QuantityController from 'src/components/QuantityController'
 import purchaseApi from 'src/apis/purchase.api'
 import { PURCHASES_STATUS } from 'src/constant/purchase'
 import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
+import PATH from 'src/constant/path'
 
 export default function ProductDetail() {
+  const navigate = useNavigate()
   const [buyCount, setBuyCount] = useState(1)
 
   const queryClient = useQueryClient()
@@ -122,6 +125,16 @@ export default function ProductDetail() {
         }
       }
     )
+  }
+
+  const buyNow = async () => {
+    const res = await addToCartMutation.mutateAsync({ buy_count: buyCount, product_id: product?._id as string })
+    const purchase = res.data.data
+    navigate(PATH.cart, {
+      state: {
+        purchaseId: purchase._id
+      }
+    })
   }
 
   if (!product) return null
@@ -266,7 +279,10 @@ export default function ProductDetail() {
                   Thêm vào giỏ hàng
                 </button>
 
-                <button className='min-[5rem] ml-4 flex h-12 items-center justify-center rounded-sm bg-orange px-5 capitalize text-white shadow-sm outline-none hover:bg-orange/90'>
+                <button
+                  className='min-[5rem] ml-4 flex h-12 items-center justify-center rounded-sm bg-orange px-5 capitalize text-white shadow-sm outline-none hover:bg-orange/90'
+                  onClick={buyNow}
+                >
                   Mua ngay
                 </button>
               </div>
