@@ -53,7 +53,7 @@ export default function useRouteElements() {
             },
             {
               path: PATH.changePassword,
-              element: <HistoryPurchase />
+              element: <ChangePassword />
             },
             {
               path: PATH.historyPurchase,
