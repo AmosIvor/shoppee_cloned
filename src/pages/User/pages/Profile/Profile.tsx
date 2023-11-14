@@ -1,6 +1,71 @@
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useContext, useEffect } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import userApi from 'src/apis/user.api'
+import Button from 'src/components/Button'
 import Input from 'src/components/Input'
+import InputNumber from 'src/components/InputNumber'
+import { UserSchema, userSchema } from 'src/utils/rules'
+import DateSelect from '../../components/DateSelect'
+import { toast } from 'react-toastify'
+import { AppContext } from 'src/contexts/app.context'
+import { setProfileToLocalStorage } from 'src/utils/auth'
+
+type FormData = Pick<UserSchema, 'name' | 'address' | 'phone' | 'date_of_birth' | 'avatar'>
+
+const profileSchema = userSchema.pick(['name', 'address', 'phone', 'date_of_birth', 'avatar'])
 
 export default function Profile() {
+  const { setProfile } = useContext(AppContext)
+  const {
+    register,
+    control,
+    formState: { errors },
+    handleSubmit,
+    setValue
+  } = useForm<FormData>({
+    defaultValues: {
+      name: '',
+      phone: '',
+      address: '',
+      avatar: '',
+      date_of_birth: new Date(1990, 0, 1)
+    },
+    resolver: yupResolver(profileSchema)
+  })
+
+  const { data: profileData, refetch } = useQuery({
+    queryKey: ['profile'],
+    queryFn: () => userApi.getProfile()
+  })
+  const profile = profileData?.data.data
+  // console.log(profile)
+
+  const updateProfileMutation = useMutation({ mutationFn: userApi.updateProfile })
+
+  useEffect(() => {
+    if (profile) {
+      setValue('name', profile.name)
+      setValue('phone', profile.phone)
+      setValue('address', profile.address)
+      setValue('avatar', profile.avatar)
+      setValue('date_of_birth', profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(1990, 0, 1))
+    }
+  }, [profile, setValue])
+
+  const onSubmit = handleSubmit(async (data) => {
+    console.log(data)
+    const res = await updateProfileMutation.mutateAsync({
+      ...data,
+      date_of_birth: data.date_of_birth?.toISOString()
+    })
+    setProfile(res.data.data)
+    setProfileToLocalStorage(res.data.data)
+    refetch()
+    toast.success(res.data.message)
+  })
+
   return (
     <div className='rounded-sm bg-white px-2 pb-10 shadow md:px-7 md:pb-20'>
       {/* Header */}
@@ -10,13 +75,13 @@ export default function Profile() {
       </div>
 
       {/* Form */}
-      <div className='mt-8 flex flex-col-reverse md:flex-row md:items-start'>
-        <form className='mt-6 flex-grow md:mt-0 md:pr-12'>
+      <form className='mt-8 flex flex-col-reverse md:flex-row md:items-start' onSubmit={onSubmit}>
+        <div className='mt-6 flex-grow md:mt-0 md:pr-12'>
           {/* Email */}
           <div className='mx-8 flex flex-col flex-wrap sm:mx-0 sm:flex-row'>
             <div className='truncate pt-3 capitalize sm:w-[20%] sm:text-right'>Email</div>
             <div className='sm:w-[80%] sm:pl-5'>
-              <div className='pt-3 text-gray-700'>amo****@gmail.com</div>
+              <div className='pt-3 text-gray-700'>{profile?.email}</div>
             </div>
           </div>
 
@@ -24,7 +89,13 @@ export default function Profile() {
           <div className='mx-8 mt-6 flex flex-col flex-wrap sm:mx-0 sm:flex-row'>
             <div className='truncate pt-3 capitalize sm:w-[20%] sm:text-right'>Tên</div>
             <div className='sm:w-[80%] sm:pl-5'>
-              <Input classNameInput='w-full rounded-sm border border-gray-300 px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm' />
+              <Input
+                classNameInput='w-full rounded-sm border border-gray-300 px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm'
+                register={register}
+                name='name'
+                placeholder='Ten'
+                errorMessage={errors.name?.message}
+              />
             </div>
           </div>
 
@@ -32,7 +103,21 @@ export default function Profile() {
           <div className='mx-8 mt-2 flex flex-col flex-wrap sm:mx-0 sm:flex-row'>
             <div className='truncate pt-3 capitalize sm:w-[20%] sm:text-right'>Số điện thoại</div>
             <div className='sm:w-[80%] sm:pl-5'>
-              <Input classNameInput='w-full rounded-sm border border-gray-300 px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm' />
+              <Controller
+                control={control}
+                name='phone'
+                render={({ field }) => (
+                  <InputNumber
+                    type='text'
+                    classNameInput='w-full rounded-sm border border-gray-300 px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm'
+                    placeholder='So dien thoai'
+                    errorMessage={errors.phone?.message}
+                    value={field.value}
+                    ref={field.ref}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
             </div>
           </div>
 
@@ -40,30 +125,38 @@ export default function Profile() {
           <div className='mx-8 mt-2 flex flex-col flex-wrap sm:mx-0 sm:flex-row'>
             <div className='truncate pt-3 capitalize sm:w-[20%] sm:text-right'>Địa chỉ</div>
             <div className='sm:w-[80%] sm:pl-5'>
-              <Input classNameInput='w-full rounded-sm border border-gray-300 px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm' />
+              <Input
+                classNameInput='w-full rounded-sm border border-gray-300 px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm'
+                register={register}
+                name='address'
+                placeholder='Dia chi'
+                errorMessage={errors.address?.message}
+              />
             </div>
           </div>
 
           {/* Date of birth */}
+          <Controller
+            control={control}
+            name='date_of_birth'
+            render={({ field }) => (
+              <DateSelect errorMessage={errors.date_of_birth?.message} onChange={field.onChange} value={field.value} />
+            )}
+          />
+
+          {/* Button Save */}
           <div className='mx-8 mt-2 flex flex-col flex-wrap sm:mx-0 sm:flex-row'>
-            <div className='truncate pt-3 capitalize sm:w-[20%] sm:text-right'>Ngày sinh</div>
+            <div className='truncate pt-3 capitalize sm:w-[20%] sm:text-right' />
             <div className='sm:w-[80%] sm:pl-5'>
-              <div className='flex justify-between'>
-                <select className='h-10 w-[32%] border border-black/10 px-3'>
-                  <option disabled>Ngày</option>
-                </select>
-
-                <select className='h-10 w-[32%] border border-black/10 px-3'>
-                  <option disabled>Tháng</option>
-                </select>
-
-                <select className='h-10 w-[32%] border border-black/10 px-3'>
-                  <option disabled>Năm</option>
-                </select>
-              </div>
+              <Button
+                className='flex h-9 items-center rounded-sm bg-orange px-5 text-center text-white hover:bg-orange/80'
+                type='submit'
+              >
+                Lưu
+              </Button>
             </div>
           </div>
-        </form>
+        </div>
 
         {/* Upload image */}
         <div className='flex justify-center md:w-72 md:border-l md:border-l-gray-200'>
@@ -76,7 +169,10 @@ export default function Profile() {
               />
             </div>
             <input type='file' accept='.jpg,.jpeg,.png' className='hidden' />
-            <button className='flex h-10 items-center justify-end rounded-sm border bg-white px-6 text-sm text-gray-600 shadow-sm'>
+            <button
+              className='flex h-10 items-center justify-end rounded-sm border bg-white px-6 text-sm text-gray-600 shadow-sm'
+              type='button'
+            >
               Chọn ảnh
             </button>
 
@@ -86,7 +182,7 @@ export default function Profile() {
             </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   )
 }

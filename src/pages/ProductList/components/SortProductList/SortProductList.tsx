@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import { ProductListConfig } from 'src/types/product.type'
 import { Link, createSearchParams, useNavigate } from 'react-router-dom'
 import PATH from 'src/constant/path'
-import { create, omit } from 'lodash'
+import { omit } from 'lodash'
 import { QueryConfig } from 'src/hooks/useQueryConfig'
 
 interface Props {

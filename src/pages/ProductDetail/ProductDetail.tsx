@@ -175,7 +175,7 @@ export default function ProductDetail() {
                   </svg>
                 </button>
 
-                {currentImages.map((img, _) => {
+                {currentImages.map((img) => {
                   const isActive = img === activeImage
                   return (
                     <div className='relative w-full pt-[100%]' key={img} onMouseEnter={() => chooseActiveImage(img)}>

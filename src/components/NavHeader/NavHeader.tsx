@@ -6,6 +6,7 @@ import PATH from 'src/constant/path'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import authApi from 'src/apis/auth.api'
 import { PURCHASES_STATUS } from 'src/constant/purchase'
+import userDefaultImage from 'src/assets/images/user-default.svg'
 
 export default function NavHeader() {
   const queryClient = useQueryClient()
@@ -87,11 +88,7 @@ export default function NavHeader() {
           }
         >
           <div className='mr-2 h-5 w-5 flex-shrink-0'>
-            <img
-              src='https://images.unsplash.com/photo-1697529985337-4a324794d22f?auto=format&fit=crop&q=80&w=1887&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-              alt=''
-              className='h-full w-full rounded-full object-cover'
-            />
+            <img src={profile?.avatar || userDefaultImage} alt='' className='h-full w-full rounded-full object-cover' />
           </div>
           <span className='mx-1'>{profile?.email}</span>
         </Popover>
