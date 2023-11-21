@@ -1,8 +1,9 @@
 import { useContext } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import PATH from 'src/constant/path'
 import { AppContext } from 'src/contexts/app.context'
 import userDefaultImage from 'src/assets/images/user-default.svg'
+import classNames from 'classnames'
 
 export default function UserSideNav() {
   const { profile } = useContext(AppContext)
@@ -40,7 +41,15 @@ export default function UserSideNav() {
 
       <div className='mt-7'>
         {/* Profile */}
-        <Link to={PATH.profile} className='flex items-center capitalize text-gray-600 transition-colors'>
+        <NavLink
+          to={PATH.profile}
+          className={({ isActive }) =>
+            classNames('flex items-center capitalize text-gray-600 transition-colors', {
+              'text-orange': isActive,
+              'text-gray-600': !isActive
+            })
+          }
+        >
           <div className='mr-3 h-[22px] w-[22px]'>
             <img
               src='https://down-vn.img.susercontent.com/file/ba61750a46794d8847c3f463c5e71cc4'
@@ -49,10 +58,18 @@ export default function UserSideNav() {
             />
           </div>
           Tài khoản của tôi
-        </Link>
+        </NavLink>
 
         {/* Change password */}
-        <Link to={PATH.changePassword} className='mt-4 flex items-center capitalize text-gray-600 transition-colors'>
+        <NavLink
+          to={PATH.changePassword}
+          className={({ isActive }) =>
+            classNames('mt-4 flex items-center capitalize text-gray-600 transition-colors', {
+              'text-orange': isActive,
+              'text-gray-600': !isActive
+            })
+          }
+        >
           <div className='mr-3 h-[22px] w-[22px]'>
             <img
               src='https://down-vn.img.susercontent.com/file/f0049e9df4e536bc3e7f140d071e9078'
@@ -61,10 +78,18 @@ export default function UserSideNav() {
             />
           </div>
           Đổi mật khẩu
-        </Link>
+        </NavLink>
 
         {/* History purchase */}
-        <Link to={PATH.historyPurchase} className='mt-4 flex items-center capitalize text-gray-600 transition-colors'>
+        <NavLink
+          to={PATH.historyPurchase}
+          className={({ isActive }) =>
+            classNames('mt-4 flex items-center capitalize text-gray-600 transition-colors', {
+              'text-orange': isActive,
+              'text-gray-600': !isActive
+            })
+          }
+        >
           <div className='mr-3 h-[22px] w-[22px]'>
             <img
               src='https://down-vn.img.susercontent.com/file/f0049e9df4e536bc3e7f140d071e9078'
@@ -73,7 +98,7 @@ export default function UserSideNav() {
             />
           </div>
           Đơn mua
-        </Link>
+        </NavLink>
       </div>
     </div>
   )
