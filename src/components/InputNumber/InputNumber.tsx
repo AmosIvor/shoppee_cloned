@@ -28,7 +28,7 @@ const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(function Inpu
 
       // Update local value state
       setLocalValue(value)
-      console.log('input-number')
+      // console.log('input-number')
     }
   }
 

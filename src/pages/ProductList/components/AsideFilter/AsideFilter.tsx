@@ -26,7 +26,6 @@ export default function AsideFilter({ queryConfig, categories }: Props) {
   const {
     control,
     handleSubmit,
-    watch,
     trigger,
     formState: { errors }
   } = useForm<FormData>({

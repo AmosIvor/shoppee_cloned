@@ -91,7 +91,7 @@ export default function Cart() {
         }) || []
       )
     })
-  }, [purchasesInCart, chosenPurchaseIdFromLocation])
+  }, [purchasesInCart, chosenPurchaseIdFromLocation, setExtendedPurchases])
 
   useEffect(() => {
     console.log('use effect')
